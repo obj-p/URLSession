@@ -1,7 +1,11 @@
 import Foundation
 
 public extension URLSession {
-    func send(_: Request) -> Response {
+    func connection(to origin: Origin) -> Connection {
+        .init(client: self, origin: origin)
+    }
+
+    func send(_: Request, to _: Origin) -> Response {
         .init()
     }
 }
