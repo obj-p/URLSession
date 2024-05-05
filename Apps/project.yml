@@ -1,0 +1,20 @@
+name: URLSession
+options:
+  bundleIdPrefix: com.objp.urlsession
+  deploymentTarget:
+    iOS: 17
+settings:
+  base:
+    GENERATE_INFOPLIST_FILE: true
+
+targets:
+  URLSession:
+    type: application
+    platform: iOS
+    sources: [URLSession]
+  URLSessionTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [URLSessionTests]
+    dependencies:
+      - target: URLSession

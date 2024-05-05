@@ -1,0 +1,11 @@
+included:
+  - Apps/URLSession
+  - Apps/URLSessionTests
+  - Sources
+  - Tests
+
+opt_in_rules:
+  - indentation_width
+
+indentation_width:
+  include_multiline_strings: false
