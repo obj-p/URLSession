@@ -6,11 +6,11 @@ let package = Package(
     name: "URLSession",
     platforms: [.iOS(.v17)],
     products: [
-        .library(name: "SSE", targets: ["SSE"]),
+        .library(name: "HTTP", targets: ["HTTP"]),
     ],
     dependencies: [],
     targets: [
-        .target(name: "SSE"),
-        .testTarget(name: "SSETests", dependencies: ["SSE"]),
+        .target(name: "HTTP"),
+        .testTarget(name: "HTTPTests", dependencies: ["HTTP"]),
     ]
 )
