@@ -8,6 +8,12 @@ public struct Request {
         self.body = body
         self.method = method
     }
+
+    public func urlRequest(url: URL) -> URLRequest {
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = method.verb
+        return urlRequest
+    }
 }
 
 public extension Request {

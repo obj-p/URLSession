@@ -1,6 +1,6 @@
 import Foundation
 
 public protocol Client {
-    func connection(to origin: Origin) -> Connection
-    func send(_ request: Request, to origin: Origin) -> Response
+    func connection(to url: URL) -> Connection
+    func submit(_ request: Request, to url: URL) -> Transfer
 }

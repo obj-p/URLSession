@@ -1,15 +1,17 @@
+import Foundation
+
 public struct Connection {
     public let client: Client
-    public let origin: Origin
+    public let url: URL
 
-    public init(client: Client, origin: Origin) {
+    public init(client: Client, url: URL) {
         self.client = client
-        self.origin = origin
+        self.url = url
     }
 }
 
 public extension Connection {
-    func send(_: Request) -> Response {
-        .init()
+    func submit(_ request: Request) -> Transfer {
+        client.submit(request, to: url)
     }
 }
