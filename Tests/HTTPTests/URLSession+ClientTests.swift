@@ -9,7 +9,8 @@ final class URLSession_ClientTests: XCTestCase {
         let expectation = expectation(description: "response is received")
 
         // When
-        connection.submit(.get()).response { _ in
+        connection.submit(.get()).response { response in
+            XCTAssertEqual(200, response.code)
             expectation.fulfill()
         }
 

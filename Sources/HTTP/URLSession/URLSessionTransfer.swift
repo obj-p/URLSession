@@ -9,8 +9,10 @@ class URLSessionTransfer: Transfer {
     init(task: URLSessionDataTask) {
         self.task = task
         future = Future { promise in
-            task.delegate = TaskDelegate { _ in
-                promise(.success(.init())) // TODO:
+            task.delegate = TaskDelegate { response in
+                withExtendedLifetime(self) {
+                    promise(.success(response))
+                }
             }
         }
     }
@@ -19,23 +21,25 @@ class URLSessionTransfer: Transfer {
         task.cancel()
     }
 
-    func response(_ onResponse: @escaping (Response) -> Void) {
+    func response(receiveResponse: @escaping (Response) -> Void) {
         future
-            .sink(receiveValue: onResponse)
+            .sink(receiveValue: receiveResponse)
             .store(in: &subscriptions)
     }
 
-    typealias Output = Result<Response, Error>
-
     private class TaskDelegate: NSObject, URLSessionTaskDelegate {
-        let completion: (Output) -> Void
+        let completion: (Response) -> Void
 
-        init(completion: @escaping (Output) -> Void) {
+        init(completion: @escaping (Response) -> Void) {
             self.completion = completion
         }
 
-        func urlSession(_: URLSession, task _: URLSessionTask, didCompleteWithError _: (any Error)?) {
-            completion(.success(.init())) // TODO:
+        func urlSession(_: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
+            guard let response = task.response as? HTTPURLResponse else {
+                fatalError() // TODO:
+            }
+
+            completion(.init(body: nil, code: response.statusCode, error: error))
         }
     }
 }
