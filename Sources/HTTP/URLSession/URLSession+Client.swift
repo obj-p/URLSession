@@ -5,11 +5,10 @@ extension URLSession: Client {
         .init(client: self, url: url)
     }
 
-    public func submit(_ request: Request, to url: URL) -> Transfer {
+    public func transfer(_ request: Request, to url: URL) -> Transfer {
         let urlRequest = request.urlRequest(url: url)
         let task = dataTask(with: urlRequest)
         let transfer = URLSessionTransfer(task: task)
-        task.resume()
         return transfer
     }
 }

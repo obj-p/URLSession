@@ -1,20 +1,15 @@
 import Combine
 import Foundation
 
-class URLSessionTransfer: Transfer {
+class URLSessionTransfer: NSObject, Transfer {
     private var task: URLSessionDataTask
-    private var future: Future<Response, Never>!
+    private var subject = PassthroughSubject<DelegateEvent, DelegateError>()
     private var subscriptions = Set<AnyCancellable>()
 
     init(task: URLSessionDataTask) {
         self.task = task
-        future = Future { promise in
-            task.delegate = TaskDelegate { response in
-                withExtendedLifetime(self) {
-                    promise(.success(response))
-                }
-            }
-        }
+        super.init()
+        task.delegate = self
     }
 
     func cancel() {
@@ -22,24 +17,43 @@ class URLSessionTransfer: Transfer {
     }
 
     func response(receiveResponse: @escaping (Response) -> Void) {
-        future
-            .sink(receiveValue: receiveResponse)
-            .store(in: &subscriptions)
+        subject.sink(receiveCompletion: { _ in }) { event in
+            if case let .completed(response) = event {
+                receiveResponse(response)
+            }
+        }
+        .store(in: &subscriptions)
     }
 
-    private class TaskDelegate: NSObject, URLSessionTaskDelegate {
-        let completion: (Response) -> Void
+    func resume() {
+        task.resume()
+    }
 
-        init(completion: @escaping (Response) -> Void) {
-            self.completion = completion
+    func suspend() {
+        task.suspend()
+    }
+}
+
+extension URLSessionTransfer: URLSessionDataDelegate {
+    func urlSession(_: URLSession, dataTask _: URLSessionDataTask, didReceive data: Data) {
+        subject.send(.received(data))
+    }
+
+    func urlSession(_: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
+        guard let response = task.response as? HTTPURLResponse else {
+            subject.send(completion: .failure(DelegateError.didCompleteWithError(error)))
+            return
         }
 
-        func urlSession(_: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
-            guard let response = task.response as? HTTPURLResponse else {
-                fatalError() // TODO:
-            }
+        subject.send(.completed(Response(code: response.statusCode)))
+    }
 
-            completion(.init(body: nil, code: response.statusCode, error: error))
-        }
+    enum DelegateEvent {
+        case completed(Response)
+        case received(Data)
+    }
+
+    enum DelegateError: Error {
+        case didCompleteWithError(Error?)
     }
 }

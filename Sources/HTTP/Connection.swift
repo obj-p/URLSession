@@ -11,7 +11,7 @@ public struct Connection {
 }
 
 public extension Connection {
-    func submit(_ request: Request) -> Transfer {
-        client.submit(request, to: url)
+    func transfer(_ request: Request) -> Transfer {
+        client.transfer(request, to: url)
     }
 }

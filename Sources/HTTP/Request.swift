@@ -1,8 +1,8 @@
 import Foundation
 
 public struct Request {
-    public let body: Body?
-    public let method: Method
+    public var body: Body?
+    public var method: Method
 
     public init(method: Method, body: Body? = nil) {
         self.body = body
@@ -11,6 +11,7 @@ public struct Request {
 
     public func urlRequest(url: URL) -> URLRequest {
         var urlRequest = URLRequest(url: url)
+        urlRequest.httpBody = body?.data
         urlRequest.httpMethod = method.verb
         return urlRequest
     }
