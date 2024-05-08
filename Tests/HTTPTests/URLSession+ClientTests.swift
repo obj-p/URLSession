@@ -4,12 +4,12 @@ import XCTest
 final class URLSession_ClientTests: XCTestCase {
     func testGETEcho() throws {
         // Given
-        let url = URL(string: "http://localhost:8080/echo")!
+        let connection = try URLSession.shared.connection(to: "http://localhost:8080")
         let expectation = expectation(description: "response is received")
-        let transfer = URLSession.shared.transfer(.get(), to: url)
+        let transfer = connection.transfer(.get(), appending: "echo")
 
-        transfer.response { response in
-            XCTAssertEqual(200, response.code)
+        transfer.receive { response, _ in
+            XCTAssertEqual(200, response?.code)
             expectation.fulfill()
         }
 

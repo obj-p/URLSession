@@ -3,7 +3,7 @@ import Foundation
 
 class URLSessionTransfer: NSObject, Transfer {
     private var task: URLSessionDataTask
-    private var subject = PassthroughSubject<DelegateEvent, DelegateError>()
+    private var subject = PassthroughSubject<DelegateEvent, Never>()
     private var subscriptions = Set<AnyCancellable>()
 
     init(task: URLSessionDataTask) {
@@ -16,10 +16,10 @@ class URLSessionTransfer: NSObject, Transfer {
         task.cancel()
     }
 
-    func response(receiveResponse: @escaping (Response) -> Void) {
-        subject.sink(receiveCompletion: { _ in }) { event in
-            if case let .completed(response) = event {
-                receiveResponse(response)
+    func receive(completion: @escaping (Response?, Error?) -> Void) {
+        subject.sink { event in
+            if case let .completed(response, error) = event {
+                completion(response, error)
             }
         }
         .store(in: &subscriptions)
@@ -40,20 +40,20 @@ extension URLSessionTransfer: URLSessionDataDelegate {
     }
 
     func urlSession(_: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
+        defer {
+            subject.send(completion: .finished)
+        }
+
         guard let response = task.response as? HTTPURLResponse else {
-            subject.send(completion: .failure(DelegateError.didCompleteWithError(error)))
+            subject.send(.completed(nil, error))
             return
         }
 
-        subject.send(.completed(Response(code: response.statusCode)))
+        subject.send(.completed(Response(code: response.statusCode), error))
     }
 
     enum DelegateEvent {
-        case completed(Response)
+        case completed(Response?, Error?)
         case received(Data)
-    }
-
-    enum DelegateError: Error {
-        case didCompleteWithError(Error?)
     }
 }

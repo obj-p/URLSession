@@ -14,4 +14,8 @@ public extension Connection {
     func transfer(_ request: Request) -> Transfer {
         client.transfer(request, to: url)
     }
+
+    func transfer(_ request: Request, appending path: String) -> Transfer {
+        client.transfer(request, to: url.appending(path: path))
+    }
 }

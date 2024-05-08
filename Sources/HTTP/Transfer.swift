@@ -1,6 +1,6 @@
 public protocol Transfer {
     func cancel()
-    func response(receiveResponse: @escaping (Response) -> Void)
+    func receive(completion: @escaping (Response?, Error?) -> Void)
     func resume()
     func suspend()
 }
