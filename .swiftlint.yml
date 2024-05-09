@@ -1,11 +1,11 @@
-included:
-  - Apps/URLSession
-  - Apps/URLSessionTests
-  - Sources
-  - Tests
+disabled_rules:
+  - trailing_comma
 
 opt_in_rules:
   - indentation_width
 
 indentation_width:
   include_multiline_strings: false
+
+type_name:
+  allowed_symbols: [_]
