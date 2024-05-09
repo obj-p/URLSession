@@ -1,4 +1,4 @@
-name: URLSession
+name: Apps
 options:
   bundleIdPrefix: com.objp.urlsession
   deploymentTarget:
@@ -7,14 +7,24 @@ settings:
   base:
     GENERATE_INFOPLIST_FILE: true
 
-targets:
+packages:
   URLSession:
+    path: ..
+
+targets:
+  iOS:
     type: application
     platform: iOS
-    sources: [URLSession]
-  URLSessionTests:
-    type: bundle.unit-test
-    platform: iOS
-    sources: [URLSessionTests]
+    sources: [iOS]
+    settings:
+      base:
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone:
+          - UIInterfaceOrientationPortrait
+        PRODUCT_MODULE_NAME: URLSession
+        PRODUCT_NAME: URLSession
     dependencies:
-      - target: URLSession
+      - package: URLSession
+        products: [HTTP]

@@ -4,4 +4,4 @@ all: clean
 
 .PHONY: clean
 clean:
-	@rm -rf URLSession.xcodeproj
+	@rm -rf Apps.xcodeproj
